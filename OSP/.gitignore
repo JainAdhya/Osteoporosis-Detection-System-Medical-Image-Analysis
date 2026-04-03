@@ -1,0 +1,6 @@
+# Ignore trained model files
+*.h5
+*.h5
+*.ckpt
+models/
+saved_models/
