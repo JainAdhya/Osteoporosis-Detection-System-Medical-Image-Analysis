@@ -1,0 +1,81 @@
+# =========================
+# Python
+# =========================
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.pkl
+
+# =========================
+# Virtual Environments
+# =========================
+venv/
+venv_tf/
+ai_env/
+env/
+.venv/
+
+# =========================
+# Jupyter Notebook checkpoints
+# =========================
+.ipynb_checkpoints/
+
+# =========================
+# Large ML Models (VERY IMPORTANT)
+# =========================
+*.h5
+*.hdf5
+*.keras
+
+# Specific models (extra safety)
+cnn_model_0.h5
+cnn_model_1.h5
+cnn_model_2.h5
+cnn_model_3.h5
+cnn_model_4.h5
+custom_cnn_model.h5
+custom_cnn_model2.h5
+final_custom_cnn_ensemble.h5
+final_ensemble_model.h5
+osteoporosis_model.h5
+
+# =========================
+# Dataset (optional - if large)
+# =========================
+dataset/
+OS Collected Data/
+
+# =========================
+# Logs / outputs
+# =========================
+*.log
+*.txt
+
+# =========================
+# VS Code
+# =========================
+.vscode/
+
+# =========================
+# Node.js (Frontend)
+# =========================
+node_modules/
+frontend/node_modules/
+
+# =========================
+# Build files
+# =========================
+dist/
+build/
+
+# =========================
+# Environment variables
+# =========================
+.env
+
+# =========================
+# OS files
+# =========================
+.DS_Store
+Thumbs.db

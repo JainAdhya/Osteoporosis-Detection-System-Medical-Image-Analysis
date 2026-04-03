@@ -1,0 +1,20 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom Popup Styling */
+.doctor-popup .leaflet-popup-content-wrapper {
+  background: linear-gradient(to right, #3b82f6, #06b6d4);
+  color: white;
+  border-radius: 12px;
+  padding: 6px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+}
+
+.doctor-popup .leaflet-popup-tip {
+  background: #3b82f6;
+}
+
+.doctor-popup .leaflet-popup-content {
+  margin: 0;
+}
