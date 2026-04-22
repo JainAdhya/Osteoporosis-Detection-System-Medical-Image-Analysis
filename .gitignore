@@ -29,16 +29,16 @@ env/
 *.keras
 
 # Specific models (extra safety)
-cnn_model_0.h5
-cnn_model_1.h5
-cnn_model_2.h5
-cnn_model_3.h5
-cnn_model_4.h5
-custom_cnn_model.h5
-custom_cnn_model2.h5
-final_custom_cnn_ensemble.h5
-final_ensemble_model.h5
-osteoporosis_model.h5
+OSP/cnn_model_0.h5
+OSP/cnn_model_1.h5
+OSP/cnn_model_2.h5
+OSP/cnn_model_3.h5
+OSP/cnn_model_4.h5
+OSP/custom_cnn_model.h5
+OSP/custom_cnn_model2.h5
+OSP/final_custom_cnn_ensemble.h5
+OSP/final_ensemble_model.h5
+OSP/osteoporosis_model.h5
 
 # =========================
 # Dataset (optional - if large)
