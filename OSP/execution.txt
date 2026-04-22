@@ -1,0 +1,3 @@
+python -m venv ai_env
+ai_env\Scripts\activate
+uvicorn Api:app --reload

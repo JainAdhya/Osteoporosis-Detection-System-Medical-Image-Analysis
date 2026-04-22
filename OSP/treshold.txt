@@ -1,0 +1,6 @@
+Model	Best Threshold	Accuracy
+Model0	0.65	91%
+Model1	0.35	90%
+Model2	0.60	92%
+Model3	0.50	90%
+Model4  0.45    94%
