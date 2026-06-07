@@ -49,7 +49,7 @@ WEIGHTS     = np.array([1.0, 1.0, 1.1, 1.0, 1.4])
 #   Run:  ollama pull llava:13b
 VLM_BACKEND  = os.getenv("VLM_BACKEND", "ollama")   # "ollama" | "openai"
 OLLAMA_URL   = os.getenv("OLLAMA_URL",  "http://localhost:11434")
-OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "llava:13b")
+OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "llava:latest")
 
 # Option B: OpenAI-compatible endpoint
 #   e.g. Together AI running LLaVA-Med / MedGemma
@@ -320,11 +320,19 @@ def call_vlm_ollama(original_b64: str, heatmap_b64: str, osteo_prob: float, diag
     payload = {
         "model": OLLAMA_MODEL,
         "prompt": f"{REPORT_SYSTEM_PROMPT}\n\n{prompt}",
-        "images": [original_b64, heatmap_b64],
+        "images": [original_b64],
         "stream": False,
         "options": {"temperature": 0.1},
     }
-    resp = requests.post(f"{OLLAMA_URL}/api/generate", json=payload, timeout=120)
+    resp = requests.post(
+        f"{OLLAMA_URL}/api/generate",
+        json=payload,
+        timeout=150
+    )
+
+    print("Status:", resp.status_code)
+    print("Response:", resp.text[:1000])
+
     resp.raise_for_status()
     text = resp.json().get("response", "")
     return json.loads(text)
@@ -517,40 +525,128 @@ async def predict(
         raise HTTPException(status_code=500, detail=str(e))
 
 
+
+
 @app.get("/get-doctors")
 def get_doctors(lat: float, lng: float):
+
     overpass_url = "https://overpass-api.de/api/interpreter"
 
     query = f"""
-    [out:json];
+    [out:json][timeout:25];
     (
-      node["healthcare"="doctor"]["speciality"="orthopaedics"](around:10000,{lat},{lng});
-      node["healthcare"="doctor"]["speciality"="endocrinology"](around:10000,{lat},{lng});
-      node["healthcare"="clinic"]["name"~"ortho|bone|joint", i](around:10000,{lat},{lng});
-      node["amenity"="hospital"]["name"~"ortho|bone|joint", i](around:10000,{lat},{lng});
+      node["amenity"="hospital"](around:5000,{lat},{lng});
+      node["healthcare"="clinic"](around:5000,{lat},{lng});
+      node["healthcare"="doctor"](around:5000,{lat},{lng});
     );
-    out;
+    out body;
     """
 
-    response = requests.get(overpass_url, params={"data": query})
-    data = response.json()
+    # Custom User-Agent containing your email to comply with Overpass API policies
+    headers = {
+        "User-Agent": "OrthoDoctorLocatorApp/1.0 (jainadhya6@gmail.com)"
+    }
+
+    try:
+        # Using POST as required for Overpass query payloads
+        response = requests.post(
+            overpass_url,
+            data={"data": query},
+            headers=headers,
+            timeout=30
+        )
+
+        response.raise_for_status()
+
+        try:
+            data = response.json()
+        except Exception:
+            print("Non-JSON response from Overpass:")
+            print(response.text[:500])
+            return {"doctors": []}
+
+    except requests.exceptions.RequestException as e:
+        print("Overpass API Error:", str(e))
+        return {"doctors": []}
+
+    ORTHO_KEYWORDS = [
+        "ortho",
+        "orthopedic",
+        "orthopaedic",
+        "bone",
+        "joint",
+        "fracture",
+        "spine",
+        "accident"
+    ]
 
     doctors = []
 
-    for place in data.get("elements", [])[:10]:
+    for place in data.get("elements", []):
+
         tags = place.get("tags", {})
+        name = tags.get("name", "")
+
+        if not name:
+            continue
+
+        name_lower = name.lower()
+
+        if not any(keyword in name_lower for keyword in ORTHO_KEYWORDS):
+            continue
 
         doctors.append({
-            "name": tags.get("name", "Orthopedic Specialist"),
-            "address": tags.get("addr:full") 
-                        or tags.get("addr:street", "") + " " + tags.get("addr:city", "")
-                        or "Address not available",
-            "speciality": tags.get("speciality", "Orthopedic / Bone Specialist"),
+            "name": name,
+            "address": (
+                tags.get("addr:full")
+                or f"{tags.get('addr:street', '')} {tags.get('addr:city', '')}".strip()
+                or "Address not available"
+            ),
+            "speciality": "Orthopedic / Bone Specialist",
             "lat": place.get("lat"),
             "lng": place.get("lon")
         })
 
-    return {"doctors": doctors}
+    print(doctors[:10])
+
+    return {
+        "doctors": doctors[:10]
+    }
+
+# @app.get("/get-doctors")
+# def get_doctors(lat: float, lng: float):
+#     overpass_url = "https://overpass-api.de/api/interpreter"
+
+#     query = f"""
+#     [out:json];
+#     (
+#       node["healthcare"="doctor"]["speciality"="orthopaedics"](around:10000,{lat},{lng});
+#       node["healthcare"="doctor"]["speciality"="endocrinology"](around:10000,{lat},{lng});
+#       node["healthcare"="clinic"]["name"~"ortho|bone|joint", i](around:10000,{lat},{lng});
+#       node["amenity"="hospital"]["name"~"ortho|bone|joint", i](around:10000,{lat},{lng});
+#     );
+#     out;
+#     """
+
+#     response = requests.get(overpass_url, params={"data": query})
+#     data = response.json()
+
+#     doctors = []
+
+#     for place in data.get("elements", [])[:10]:
+#         tags = place.get("tags", {})
+
+#         doctors.append({
+#             "name": tags.get("name", "Orthopedic Specialist"),
+#             "address": tags.get("addr:full") 
+#                         or tags.get("addr:street", "") + " " + tags.get("addr:city", "")
+#                         or "Address not available",
+#             "speciality": tags.get("speciality", "Orthopedic / Bone Specialist"),
+#             "lat": place.get("lat"),
+#             "lng": place.get("lon")
+#         })
+
+#     return {"doctors": doctors}
 
 
 
