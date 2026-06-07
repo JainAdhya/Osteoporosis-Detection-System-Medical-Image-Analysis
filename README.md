@@ -88,6 +88,9 @@ Clinicians can securely upload X-ray scans and instantly receive probability sco
 <p align="center">
   <img src="assets/10.jpg" width="100%" alt="Saliency Map and Report Part 2" />
 </p>
+<p align="center">
+  <img src="assets/11.jpg" width="100%" alt="Features of OsteoAI" />
+</p>
 
 ---
 
