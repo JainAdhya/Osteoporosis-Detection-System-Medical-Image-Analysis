@@ -104,3 +104,101 @@ Clinicians can securely upload X-ray scans and instantly receive probability sco
 Before running the backend, you must generate the models. Open the Jupyter Notebook and execute all cells sequentially:
 ```bash
 jupyter notebook custom_cnn_3.ipynb
+
+## 🧠 Model Weights
+
+After training, ensure that all **5 ensemble model weights** are saved in the appropriate directory used by the backend API.
+
+Example:
+
+```text
+OSP/
+├── custom_cnn_0.h5
+├── custom_cnn_1.h5
+├── custom_cnn_2.h5
+├── custom_cnn_3.h5
+└── custom_cnn_4.h5
+```
+
+> **Note:** The backend loads all five models during startup. Missing weight files will cause the API initialization to fail.
+
+---
+
+## ⚙️ Backend Environment Setup
+
+### Windows
+
+```bash
+python -m venv ai_env
+ai_env\Scripts\activate
+
+cd OSP
+
+pip install -r requirements.txt
+```
+
+### macOS / Linux
+
+```bash
+python3 -m venv ai_env
+source ai_env/bin/activate
+
+cd OSP
+
+pip install -r requirements.txt
+```
+
+---
+
+## 🚀 Run the Backend API
+
+Start the FastAPI application using Uvicorn:
+
+```bash
+uvicorn Api:app --reload
+```
+
+Once the server starts, the API will be available at:
+
+```text
+http://localhost:8000
+```
+
+Interactive Swagger documentation:
+
+```text
+http://localhost:8000/docs
+```
+
+---
+
+## 📦 Requirements (`OSP/requirements.txt`)
+
+```txt
+fastapi==0.111.0
+uvicorn[standard]==0.30.1
+python-multipart==0.0.9
+tensorflow==2.16.1
+numpy==1.26.4
+opencv-python-headless==4.9.0.80
+Pillow==10.3.0
+gdown==5.2.0
+requests==2.31.0
+```
+
+> **Note:** If no GPU is available, you may use:
+>
+> ```txt
+> tensorflow-cpu==2.16.1
+> ```
+
+---
+
+## ⚠️ Disclaimer
+
+**OsteoVision AI** is an AI-powered osteoporosis screening and clinical decision support system intended for research, educational, and assistive diagnostic purposes only.
+
+The predictions, Grad-CAM visualizations, and AI-generated radiology reports produced by this system should **not** be considered a substitute for professional medical advice, diagnosis, or treatment.
+
+Always consult a qualified radiologist, physician, or healthcare professional before making any clinical decisions based on the output of this application.
+
